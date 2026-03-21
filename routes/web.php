@@ -14,7 +14,9 @@ use App\Http\Controllers\AuthController;
 Route::get('/', function () {
     return view('welcome');
 });
-
+Route::get('/welcome', function () {
+    return view('welcome');
+})->name('welcome');
 // 2. የተማሪዎች አስተዳደር (Index, Create, Store, Edit, Update, Destroy)
 Route::resource('students', StudentController::class);
 
