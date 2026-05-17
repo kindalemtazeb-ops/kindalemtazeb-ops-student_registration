@@ -3,92 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STUDENT LISTS</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f7f6; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 1100px; margin: auto; }
-        h2 { color: #2c3e50; margin-top: 0; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-        th, td { border: 1px solid #eee; padding: 15px; text-align: left; }
-        th { background-color: #34495e; color: white; text-transform: uppercase; font-size: 14px; }
-        tr:hover { background-color: #f1f1f1; transition: 0.3s; }
-
-        .success { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; border: 1px solid #c3e6cb; margin-bottom: 20px; }
-
-        /* Buttons Style */
-        .btn-edit { background-color: #f39c12; color: white; padding: 8px 14px; text-decoration: none; border-radius: 5px; font-size: 13px; }
-        .btn-delete { background-color: #e74c3c; color: white; padding: 8px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; }
-        .btn-register { background-color: #2ecc71; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; }
-
-        .actions-cell { display: flex; gap: 8px; }
-        .search-input { padding: 10px; width: 250px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
-        .btn-search { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    </style>
+    <title>Student Records Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col items-center py-12 px-4">
 
-<div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <h2>STUDENT MANAGEMENT SYSTEM</h2>
-        </div>
+    <header class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight mb-2">
+            Student Records Portal
+        </h1>
+        <p class="text-slate-500">Search by Student ID & Manage Records</p>
+    </header>
 
     @if(session('success'))
-        <div class="success">{{ session('success') }}</div>
+        <div class="w-full max-w-4xl mb-4 bg-green-100 border border-green-300 text-green-800 px-5 py-3 rounded-xl text-sm font-medium shadow-sm">
+            {{ session('success') }}
+        </div>
     @endif
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <form action="{{ route('students.index') }}" method="GET">
-            <input type="text" name="search" class="search-input" placeholder="Search by Student ID..." value="{{ request('search') }}">
-            <button type="submit" class="btn-search">Search</button>
-            @if(request('search'))
-                <a href="{{ route('students.index') }}" style="margin-left: 10px; color: #e74c3c; text-decoration: none;">Clear Search</a>
-            @endif
-        </form>
-
-        <a href="{{ route('students.create') }}" class="btn-register">+ Register New Student</a>
+    <div class="w-full max-w-4xl mb-4 flex justify-end">
+        <a href="{{ route('students.create') }}" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-md flex items-center gap-2 no-underline">
+            <span>+</span> <span>Register New Student</span>
+        </a>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Student ID</th>
-                <th>Full Name</th>
-                <th>National ID</th>
-                <th>Email</th>
-                <th>Department</th>
-                <th>GPA</th>
-                <th style="width: 150px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($students as $student)
-                <tr>
-                    <td><strong>{{ $student->student_id }}</strong></td>
-                    <td>{{ $student->full_name }}</td>
-                    <td>{{ $student->national_id }}</td>
-                    <td>{{ $student->email }}</td>
-                    <td>{{ $student->department }}</td>
-                    <td><span style="background: #eee; padding: 3px 8px; border-radius: 4px;">{{ $student->gpa }}</span></td>
-                    <td class="actions-cell">
-                        <a href="{{ route('students.edit', $student->student_id) }}" class="btn-edit">Edit</a>
+    <div class="w-full max-w-4xl mb-4 flex gap-2">
+        <form action="{{ route('students.index') }}" method="GET" class="flex flex-1 gap-2">
+            <div class="relative flex-1">
+                <input type="text" name="search" class="w-full pl-4 pr-4 py-3 border border-indigo-200 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm placeholder-slate-400 transition" placeholder="Enter Student ID to search..." value="{{ request('search') }}">
+            </div>
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-sm font-medium transition shadow-md">
+                Search
+            </button>
+            @if(request('search'))
+                <a href="{{ route('students.index') }}" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-5 py-3 rounded-xl text-sm font-medium transition border border-slate-300 no-underline flex items-center">
+                    Show All
+                </a>
+            @endif
+        </form>
+    </div>
 
-                        <form action="{{ route('students.destroy', $student->student_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this student?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-delete">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 30px; color: #7f8c8d;">
-                        No student records found in the database.
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left">
+                <thead>
+                    <tr class="bg-indigo-600 text-white text-sm uppercase font-semibold tracking-wider">
+                        <th class="py-4 px-6">Student ID</th>
+                        <th class="py-4 px-6">Full Name</th>
+                        <th class="py-4 px-6">National ID</th>
+                        <th class="py-4 px-6">Email</th>
+                        <th class="py-4 px-6">Department</th>
+                        <th class="py-4 px-6 text-center">GPA</th>
+                        <th class="py-4 px-6 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-slate-600 divide-y divide-slate-100">
+                    @forelse($students as $student)
+                        <tr class="hover:bg-indigo-50/50 transition-colors">
+                            <td class="py-4 px-6 font-mono text-sm text-slate-400">#{{ $student->student_id }}</td>
+                            <td class="py-4 px-6 font-medium text-slate-900">{{ $student->full_name }}</td>
+                            <td class="py-4 px-6">{{ $student->national_id }}</td>
+                            <td class="py-4 px-6">{{ $student->email }}</td>
+                            <td class="py-4 px-6">{{ $student->department }}</td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="{{ $student->gpa >= 3.5 ? 'bg-indigo-100 text-indigo-700' : 'bg-green-100 text-green-700' }} py-1 px-3 rounded-full text-xs font-bold">
+                                    {{ $student->gpa }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 text-right flex justify-end gap-3">
+                                <a href="{{ route('students.edit', $student->student_id) }}" class="text-indigo-600 hover:text-indigo-900 text-sm font-semibold transition no-underline">
+                                    Edit
+                                </a>
+                                <form action="{{ route('students.destroy', $student->student_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this student?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-semibold transition bg-transparent border-none cursor-pointer">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="py-8 text-center text-slate-400 italic bg-slate-50/50">
+                                No student records found.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-slate-50 p-4 border-t border-slate-100 flex justify-between items-center">
+            <span class="text-sm text-slate-500">Showing {{ $students->count() }} student(s)</span>
+        </div>
+    </div>
 
 </body>
 </html>
