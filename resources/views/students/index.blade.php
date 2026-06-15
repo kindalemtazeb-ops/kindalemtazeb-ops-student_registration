@@ -4,90 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>STUDENT LISTS</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f7f6; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 1100px; margin: auto; }
-        h2 { color: #2c3e50; margin-top: 0; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-        th, td { border: 1px solid #eee; padding: 15px; text-align: left; }
-        th { background-color: #34495e; color: white; text-transform: uppercase; font-size: 14px; }
-        tr:hover { background-color: #f1f1f1; transition: 0.3s; }
-
-        .success { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; border: 1px solid #c3e6cb; margin-bottom: 20px; }
-
-        /* Buttons Style */
-        .btn-edit { background-color: #f39c12; color: white; padding: 8px 14px; text-decoration: none; border-radius: 5px; font-size: 13px; }
-        .btn-delete { background-color: #e74c3c; color: white; padding: 8px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; }
-        .btn-register { background-color: #2ecc71; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold; }
-
-        .actions-cell { display: flex; gap: 8px; }
-        .search-input { padding: 10px; width: 250px; border: 1px solid #ddd; border-radius: 6px; outline: none; }
-        .btn-search { padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 p-4 md:p-6 font-sans antialiased text-gray-900">
 
-<div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <h2>STUDENT MANAGEMENT SYSTEM</h2>
+<div class="max-w-5xl mx-auto bg-white p-5 rounded-2xl shadow-lg border border-gray-200">
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+        <div>
+            <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight uppercase">Student System</h2>
+            <p class="text-gray-500 text-xs">Manage your student records efficiently</p>
         </div>
-
-    @if(session('success'))
-        <div class="success">{{ session('success') }}</div>
-    @endif
-
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <form action="{{ route('students.index') }}" method="GET">
-            <input type="text" name="search" class="search-input" placeholder="Search by Student ID..." value="{{ request('search') }}">
-            <button type="submit" class="btn-search">Search</button>
-            @if(request('search'))
-                <a href="{{ route('students.index') }}" style="margin-left: 10px; color: #e74c3c; text-decoration: none;">Clear Search</a>
-            @endif
-        </form>
-
-        <a href="{{ route('students.create') }}" class="btn-register">+ Register New Student</a>
+        <a href="{{ route('students.create') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all transform hover:scale-105 shadow-md flex items-center gap-2 text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Register New
+        </a>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Student ID</th>
-                <th>Full Name</th>
-                <th>National ID</th>
-                <th>Email</th>
-                <th>Department</th>
-                <th>GPA</th>
-                <th style="width: 150px;">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($students as $student)
-                <tr>
-                    <td><strong>{{ $student->student_id }}</strong></td>
-                    <td>{{ $student->full_name }}</td>
-                    <td>{{ $student->national_id }}</td>
-                    <td>{{ $student->email }}</td>
-                    <td>{{ $student->department }}</td>
-                    <td><span style="background: #eee; padding: 3px 8px; border-radius: 4px;">{{ $student->gpa }}</span></td>
-                    <td class="actions-cell">
-                        <a href="{{ route('students.edit', $student->student_id) }}" class="btn-edit">Edit</a>
+    @if(session('success'))
+        <div class="bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700 px-4 py-3 rounded-lg mb-6 flex items-center justify-between shadow-sm">
+            <span class="text-sm font-medium">{{ session('success') }}</span>
+            <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800">&times;</button>
+        </div>
+    @endif
 
-                        <form action="{{ route('students.destroy', $student->student_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this student?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-delete">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
+    <div class="mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-wrap items-center gap-3">
+        <form action="{{ route('students.index') }}" method="GET" class="flex flex-1 items-center gap-2">
+            <div class="relative flex-1 max-w-xs">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </span>
+                <input type="text" name="search"
+                       class="border border-gray-300 pl-9 pr-4 py-2 w-full rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm"
+                       placeholder="Search ID or Name..." value="{{ request('search') }}">
+            </div>
+
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-sm transition-all active:scale-95">
+                Search
+            </button>
+        </form>
+
+        @if(request('search'))
+            <a href="{{ route('students.index') }}" class="text-red-500 hover:text-red-700 font-bold text-xs flex items-center gap-1 hover:underline">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                Clear
+            </a>
+        @endif
+    </div>
+
+    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
+        <table class="w-full text-left border-collapse table-auto">
+            <thead class="bg-slate-800 text-white text-[11px] uppercase tracking-wider">
                 <tr>
-                    <td colspan="7" style="text-align: center; padding: 30px; color: #7f8c8d;">
-                        No student records found in the database.
+                    <th class="p-3 border-b border-slate-700">ID</th>
+                    <th class="p-3 border-b border-slate-700">Full Name</th>
+                    <th class="p-3 border-b border-slate-700">Email Address</th>
+                    <th class="p-3 border-b border-slate-700 text-center">GPA</th>
+                    <th class="p-3 border-b border-slate-700 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 bg-white">
+                @forelse($students as $student)
+                <tr class="hover:bg-slate-50 transition duration-150">
+                    <td class="p-3 font-bold text-blue-600 text-sm">#{{ $student->student_id }}</td>
+                    <td class="p-3">
+                        <div class="font-bold text-gray-800 text-sm">{{ $student->full_name }}</div>
+                    </td>
+                    <td class="p-3 text-gray-500 text-xs truncate max-w-[180px]">{{ $student->email }}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-black tracking-wide shadow-sm {{ $student->gpa >= 3.0 ? 'bg-green-100 text-green-700 border border-green-200' : 'bg-amber-100 text-amber-700 border border-amber-200' }}">
+                            {{ number_format($student->gpa, 2) }}
+                        </span>
+                    </td>
+                    <td class="p-3">
+                        <div class="flex justify-center gap-2">
+                            <a href="{{ route('students.edit', $student->student_id) }}"
+                               class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 border border-blue-100">
+                               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                               Edit
+                            </a>
+
+                            <form action="{{ route('students.destroy', $student->student_id) }}" method="POST"
+                                  onsubmit="return confirm('እርግጠኛ ነህ? ይህ መረጃ ዳግም አይመለስም!')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 border border-red-100">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
-            @endforelse
-        </tbody>
-    </table>
+                @empty
+                <tr>
+                    <td colspan="5" class="p-16 text-center">
+                        <div class="flex flex-col items-center justify-center text-gray-400">
+                            <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="text-lg font-medium">No records found.</span>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-6 text-sm">
+        {{ $students->links() }}
+    </div>
 </div>
 
 </body>

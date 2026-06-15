@@ -10,15 +10,26 @@ use Illuminate\Validation\Rules\Password;
 class StudentController extends Controller
 {
     /**
-     * ሁሉንም ተማሪዎች ማሳያ (Search ጨምሮ)
+     * ሁሉንም ተማሪዎች ማሳያ (Smart Search ጨምሮ)
      */
     public function index(Request $request)
     {
         $query = Student::query();
+
         if ($request->filled('search')) {
-            $query->where('student_id', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+
+            $query->where(function($q) use ($search) {
+                // ID በትክክል ሲገጥም ብቻ (Exact Match)
+                $q->where('student_id', $search)
+                // ስም ግን በከፊል ቢሆንም (Partial Match) እንዲያመጣ
+                  ->orWhere('full_name', 'like', '%' . $search . '%');
+            });
         }
-        $students = $query->get();
+
+        // የቅርብ ጊዜ ተመዝጋቢዎችን አስቀድሞ በፔጅ ያመጣል
+        $students = $query->latest()->paginate(5);
+
         return view('students.index', compact('students'));
     }
 
@@ -74,7 +85,7 @@ class StudentController extends Controller
      */
     public function edit($student_id)
     {
-        // ተማሪውን በ ID ፈልጎ ማግኘት
+        // ተማሪውን በ student_id ፈልጎ ማግኘት
         $student = Student::where('student_id', $student_id)->firstOrFail();
         return view('students.edit', compact('student'));
     }
@@ -88,8 +99,9 @@ class StudentController extends Controller
 
         $request->validate([
             'full_name'   => 'required|regex:/^[a-zA-Z\s]+$/|max:255',
-            'email'       => 'required|email|unique:students,email,' . $student->student_id . ',student_id',
-            'national_id' => 'required|numeric|unique:students,national_id,' . $student->student_id . ',student_id',
+            // ኢሜይሉ የራሱ ከሆነ allow እንዲያደርገው ተስተካክሏል
+            'email'       => 'required|email|unique:students,email,' . $student->id,
+            'national_id' => 'required|numeric|unique:students,national_id,' . $student->id,
             'department'  => 'required',
             'gpa'         => 'required|numeric|between:1.0,4.0',
         ]);
