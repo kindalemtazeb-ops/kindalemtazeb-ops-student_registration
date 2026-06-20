@@ -10,10 +10,12 @@ use App\Http\Controllers\AuthController;
 |--------------------------------------------------------------------------
 */
 
-// 1. የዌልካም ገጽ
+// 1. የመመዝገቢያ ማረፊያ ገጽ (Landing Page)
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('landing');
+})->name('landing');
+
+// 2. የዌልካም ገጽ
 Route::get('/welcome', function () {
     return view('welcome');
 })->name('welcome');
